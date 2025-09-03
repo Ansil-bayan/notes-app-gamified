@@ -1,24 +1,42 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios'; // No longer needed for frontend-only
+
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface NoteFormProps {
+  notes: Note[];
+  setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
   onNoteCreated: () => void;
 }
 
-const NoteForm: React.FC<NoteFormProps> = ({ onNoteCreated }) => {
+const NoteForm: React.FC<NoteFormProps> = ({ notes, setNotes, onNoteCreated }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await axios.post('/api/notes', { title, content });
-      setTitle('');
-      setContent('');
-      onNoteCreated(); // Call the callback to refresh the note list
-    } catch (error) {
-      console.error('Error creating note:', error);
-    }
+
+    const newNote: Note = {
+      id: Date.now().toString(), // Unique ID for local notes
+      title,
+      content,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Add note to local state immediately
+    setNotes(prevNotes => [...prevNotes, newNote]);
+    setTitle('');
+    setContent('');
+    onNoteCreated(); // Trigger points update
+
+    console.warn("Note added to browser's memory (not persistent).");
   };
 
   return (
