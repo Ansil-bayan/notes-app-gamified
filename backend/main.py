@@ -11,6 +11,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",  # React app default port
+    "https://gamified-notes-rg5jdj7wf-ansil-bayans-projects.vercel.app" # Your Vercel deployed app
 ]
 
 app.add_middleware(
@@ -69,3 +70,7 @@ async def delete_note(id: ObjectId):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
     await db.engine.delete(note)
     return
+
+from vercel_fastapi import VercelFastAPI
+
+handler = VercelFastAPI(app=app)
